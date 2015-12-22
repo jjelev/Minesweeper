@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mines</title>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/yeti/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <script type="application/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <style>
+        button {
+            height: 39px;
+            width: 39px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div id="mines-container" class="col-md-12">
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var container = $('#mines-container');
+        var matrix;
+        var maxX;
+        var maxY;
+
+        $.ajax({
+            url: 'http://localhost:8000/',
+            type: "get",
+            success: function (data) {
+                matrix = $.parseJSON(data);
+
+                $.each(matrix, function (x, arr) {
+                    var row = $('<div class="row">').appendTo(container);
+
+                    $.each(arr, function (y, val) {
+                        row.append('<button class="btn btn-default" type="button" value="' + val + '" data-x="' + x + '" data-y="' + y + '"><i class="fa fa-circle-thin"></i></button>')
+                    });
+                });
+            }
+        });
+
+        $(container).on("click", "button", function (e) {
+            e.preventDefault();
+
+            var btn = $(this);
+            var icon = btn.children('i');
+
+            if (icon.attr('class').indexOf("flag") > -1) {
+
+                icon.attr('class', 'fa fa-circle-thin');
+
+            } else {
+
+                if (btn.val() == 0) {
+                    icon.attr('class', 'fa fa-check');
+                    btn.prop('disabled', true);
+                } else {
+                    btn.attr('class', 'btn btn-danger');
+                    icon.attr('class', 'fa fa-bug');
+                    //disable all
+                    $('button').prop('disabled', true);
+                }
+            }
+        });
+
+        $(container).on("contextmenu", "button", function (e) {
+            $(this).children('i').attr('class', 'fa fa-flag');
+            return false;
+        });
+    });
+</script>
+
+</body>
+</html>
